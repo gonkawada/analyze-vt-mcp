@@ -160,6 +160,8 @@ To connect this server to Claude Desktop, add the following to your `claude_desk
 - **Linux**: `~/.config/claude/claude_desktop_config.json`  
 - **Windows**: `%APPDATA%\\Claude\\claude_desktop_config.json`
 
+### STDIO Transport Connection (Recommended)
+
 ```json
 {
   "mcpServers": {
@@ -179,6 +181,82 @@ To connect this server to Claude Desktop, add the following to your `claude_desk
   }
 }
 ```
+
+### SSE Transport Connection
+
+To connect via SSE, first start the server in a separate process:
+
+**1. Start the server:**
+```bash
+# Default configuration (0.0.0.0:8000)
+VIRUSTOTAL_API_KEY=your_api_key_here MCP_TRANSPORT=sse uv run main.py
+
+# Custom host and port
+VIRUSTOTAL_API_KEY=your_api_key_here MCP_TRANSPORT=sse MCP_HOST=127.0.0.1 MCP_PORT=3000 uv run main.py
+```
+
+**2. Claude Desktop configuration:**
+```json
+{
+  "mcpServers": {
+    "virustotal-sse": {
+      "url": "http://localhost:8000/sse"
+    }
+  }
+}
+```
+
+**For custom port:**
+```json
+{
+  "mcpServers": {
+    "virustotal-sse": {
+      "url": "http://localhost:3000/sse"
+    }
+  }
+}
+```
+
+### StreamableHTTP Transport Connection
+
+To connect via StreamableHTTP, first start the server in a separate process:
+
+**1. Start the server:**
+```bash
+# Default configuration (0.0.0.0:8000)
+VIRUSTOTAL_API_KEY=your_api_key_here MCP_TRANSPORT=streamable-http uv run main.py
+
+# Custom host and port
+VIRUSTOTAL_API_KEY=your_api_key_here MCP_TRANSPORT=streamable-http MCP_HOST=127.0.0.1 MCP_PORT=3000 uv run main.py
+```
+
+**2. Claude Desktop configuration:**
+```json
+{
+  "mcpServers": {
+    "virustotal-http": {
+      "url": "http://localhost:8000"
+    }
+  }
+}
+```
+
+**For custom port:**
+```json
+{
+  "mcpServers": {
+    "virustotal-http": {
+      "url": "http://localhost:3000"
+    }
+  }
+}
+```
+
+### Transport Selection Guidelines
+
+- **STDIO**: Best for Claude Desktop integration. Process management is automated and configuration is simplest.
+- **SSE**: Suitable for multiple simultaneous client connections or web browser-based clients.
+- **StreamableHTTP**: Ideal for custom HTTP clients or integrations requiring streaming support.
 
 ## Transport Options
 

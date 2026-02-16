@@ -160,6 +160,8 @@
 - **Linux**: `~/.config/claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\\Claude\\claude_desktop_config.json`
 
+### STDIOトランスポートでの接続（推奨）
+
 ```json
 {
   "mcpServers": {
@@ -179,6 +181,82 @@
   }
 }
 ```
+
+### SSEトランスポートでの接続
+
+サーバーを別プロセスで起動してから、SSE経由で接続する場合：
+
+**1. サーバーの起動:**
+```bash
+# デフォルト設定（0.0.0.0:8000）
+VIRUSTOTAL_API_KEY=your_api_key_here MCP_TRANSPORT=sse uv run main.py
+
+# カスタムホスト・ポート
+VIRUSTOTAL_API_KEY=your_api_key_here MCP_TRANSPORT=sse MCP_HOST=127.0.0.1 MCP_PORT=3000 uv run main.py
+```
+
+**2. Claude Desktop設定:**
+```json
+{
+  "mcpServers": {
+    "virustotal-sse": {
+      "url": "http://localhost:8000/sse"
+    }
+  }
+}
+```
+
+**カスタムポートの場合:**
+```json
+{
+  "mcpServers": {
+    "virustotal-sse": {
+      "url": "http://localhost:3000/sse"
+    }
+  }
+}
+```
+
+### StreamableHTTPトランスポートでの接続
+
+サーバーを別プロセスで起動してから、StreamableHTTP経由で接続する場合：
+
+**1. サーバーの起動:**
+```bash
+# デフォルト設定（0.0.0.0:8000）
+VIRUSTOTAL_API_KEY=your_api_key_here MCP_TRANSPORT=streamable-http uv run main.py
+
+# カスタムホスト・ポート
+VIRUSTOTAL_API_KEY=your_api_key_here MCP_TRANSPORT=streamable-http MCP_HOST=127.0.0.1 MCP_PORT=3000 uv run main.py
+```
+
+**2. Claude Desktop設定:**
+```json
+{
+  "mcpServers": {
+    "virustotal-http": {
+      "url": "http://localhost:8000"
+    }
+  }
+}
+```
+
+**カスタムポートの場合:**
+```json
+{
+  "mcpServers": {
+    "virustotal-http": {
+      "url": "http://localhost:3000"
+    }
+  }
+}
+```
+
+### トランスポート選択のガイドライン
+
+- **STDIO**: Claude Desktopとの統合に最適。プロセス管理が自動化され、最もシンプルな設定。
+- **SSE**: 複数のクライアントから同時接続する場合や、Webブラウザベースのクライアントに適している。
+- **StreamableHTTP**: カスタムHTTPクライアントやストリーミング対応が必要な統合に適している。
 
 ## トランスポートオプション
 
