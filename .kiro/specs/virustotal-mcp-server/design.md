@@ -46,7 +46,7 @@ graph TB
 
 - **レイヤード アーキテクチャ**: 明確な責任分離により保守性を確保
 - **非同期処理**: httpxとasyncioを使用した効率的なAPI呼び出し
-- **マルチトランスポート**: STDIOとSSEの両方をサポート
+- **マルチトランスポート**: STDIO、SSE、StreamableHTTPの3つをサポート
 - **エラー分離**: 各レイヤーで適切なエラーハンドリング
 
 ## コンポーネントと インターフェース
@@ -129,7 +129,9 @@ def format_relationship_item(item: Dict[str, Any]) -> str
 **設定項目**:
 ```python
 API_KEY = os.getenv("VIRUSTOTAL_API_KEY")  # 必須
-MCP_TRANSPORT = os.getenv("MCP_TRANSPORT", "sse")  # オプション
+MCP_TRANSPORT = os.getenv("MCP_TRANSPORT", "sse")  # オプション: stdio, sse, streamable-http
+MCP_HOST = os.getenv("MCP_HOST", "0.0.0.0")  # オプション: ホストアドレス
+MCP_PORT = os.getenv("MCP_PORT", "8000")  # オプション: ポート番号
 VT_BASE_URL = "https://www.virustotal.com/api/v3"  # 固定
 ```
 

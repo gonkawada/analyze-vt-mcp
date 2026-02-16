@@ -15,7 +15,7 @@ This MCP server integrates VirusTotal's extensive security database, allowing AI
 - **Domain Analysis**: DNS records, WHOIS data, SSL certificates, and subdomains
 - **Detailed Relationship Queries**: Paginated access to specific relationship types for deep investigation
 - **Rate Limit Aware**: Respects VirusTotal API limitations
-- **Multiple Transport Support**: SSE and STDIO transports for different integration needs
+- **Multiple Transport Support**: SSE, STDIO, and StreamableHTTP transports for different integration needs
 
 ## Quick Start
 
@@ -67,11 +67,17 @@ This MCP server integrates VirusTotal's extensive security database, allowing AI
 
 3. **Run the server:**
    ```bash
-   # SSE transport (web-friendly)
+   # SSE transport (web-friendly, default)
    uv run main.py
    
    # STDIO transport (for Claude Desktop)
    MCP_TRANSPORT=stdio uv run main.py
+   
+   # StreamableHTTP transport (for HTTP streaming)
+   MCP_TRANSPORT=streamable-http uv run main.py
+   
+   # Custom host and port (for SSE or StreamableHTTP)
+   MCP_HOST=127.0.0.1 MCP_PORT=9000 uv run main.py
    ```
 
 ## Tools Available
@@ -174,6 +180,34 @@ To connect this server to Claude Desktop, add the following to your `claude_desk
 }
 ```
 
+## Transport Options
+
+This server supports three transport modes:
+
+### 1. STDIO Transport
+- **Use case**: Claude Desktop integration, command-line tools
+- **Configuration**: Set `MCP_TRANSPORT=stdio`
+- **Communication**: Standard input/output streams
+
+### 2. SSE Transport (Default)
+- **Use case**: Web applications, browser-based clients
+- **Configuration**: Set `MCP_TRANSPORT=sse` or leave unset
+- **Communication**: Server-Sent Events over HTTP
+- **Default endpoint**: `http://0.0.0.0:8000`
+
+### 3. StreamableHTTP Transport
+- **Use case**: HTTP-based streaming applications, custom integrations
+- **Configuration**: Set `MCP_TRANSPORT=streamable-http`
+- **Communication**: HTTP streaming with chunked transfer encoding
+- **Default endpoint**: `http://0.0.0.0:8000`
+
+### Environment Variables
+
+- `MCP_TRANSPORT`: Transport mode (`stdio`, `sse`, or `streamable-http`). Default: `sse`
+- `MCP_HOST`: Host address for SSE/StreamableHTTP. Default: `0.0.0.0`
+- `MCP_PORT`: Port number for SSE/StreamableHTTP. Default: `8000`
+- `VIRUSTOTAL_API_KEY`: Your VirusTotal API key (required)
+
 ## Resources
 
 - **FastMCP Documentation**: [github.com/jlowin/fastmcp](https://github.com/jlowin/fastmcp)
@@ -187,6 +221,6 @@ To connect this server to Claude Desktop, add the following to your `claude_desk
 - **v1.0.0**: Initial release with comprehensive VirusTotal integration
   - 8 security analysis tools
   - Automatic relationship fetching
-  - SSE and STDIO transport support
+  - SSE, STDIO, and StreamableHTTP transport support
   - Rate limiting awareness
   - Complete error handling

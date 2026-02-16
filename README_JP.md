@@ -15,7 +15,7 @@
 - **ドメイン分析**: DNSレコード、WHOISデータ、SSL証明書、サブドメイン
 - **詳細な関係クエリ**: 深い調査のための特定の関係タイプへのページネーション対応アクセス
 - **レート制限対応**: VirusTotal APIの制限を遵守
-- **複数トランスポート対応**: 異なる統合ニーズに対応するSSEとSTDIOトランスポート
+- **複数トランスポート対応**: 異なる統合ニーズに対応するSSE、STDIO、StreamableHTTPトランスポート
 
 ## クイックスタート
 
@@ -67,11 +67,17 @@
 
 3. **サーバーの実行:**
    ```bash
-   # SSEトランスポート（Web対応）
+   # SSEトランスポート（Web対応、デフォルト）
    uv run main.py
    
    # STDIOトランスポート（Claude Desktop用）
    MCP_TRANSPORT=stdio uv run main.py
+   
+   # StreamableHTTPトランスポート（HTTPストリーミング用）
+   MCP_TRANSPORT=streamable-http uv run main.py
+   
+   # カスタムホストとポート（SSEまたはStreamableHTTP用）
+   MCP_HOST=127.0.0.1 MCP_PORT=9000 uv run main.py
    ```
 
 ## 利用可能なツール
@@ -174,6 +180,34 @@
 }
 ```
 
+## トランスポートオプション
+
+このサーバーは3つのトランスポートモードをサポートしています：
+
+### 1. STDIOトランスポート
+- **用途**: Claude Desktop統合、コマンドラインツール
+- **設定**: `MCP_TRANSPORT=stdio`を設定
+- **通信方式**: 標準入出力ストリーム
+
+### 2. SSEトランスポート（デフォルト）
+- **用途**: Webアプリケーション、ブラウザベースのクライアント
+- **設定**: `MCP_TRANSPORT=sse`を設定、または未設定
+- **通信方式**: HTTP上のServer-Sent Events
+- **デフォルトエンドポイント**: `http://0.0.0.0:8000`
+
+### 3. StreamableHTTPトランスポート
+- **用途**: HTTPベースのストリーミングアプリケーション、カスタム統合
+- **設定**: `MCP_TRANSPORT=streamable-http`を設定
+- **通信方式**: チャンク転送エンコーディングを使用したHTTPストリーミング
+- **デフォルトエンドポイント**: `http://0.0.0.0:8000`
+
+### 環境変数
+
+- `MCP_TRANSPORT`: トランスポートモード（`stdio`、`sse`、または`streamable-http`）。デフォルト: `sse`
+- `MCP_HOST`: SSE/StreamableHTTP用のホストアドレス。デフォルト: `0.0.0.0`
+- `MCP_PORT`: SSE/StreamableHTTP用のポート番号。デフォルト: `8000`
+- `VIRUSTOTAL_API_KEY`: VirusTotal APIキー（必須）
+
 ## リソース
 
 - **FastMCP ドキュメント**: [github.com/jlowin/fastmcp](https://github.com/jlowin/fastmcp)
@@ -187,6 +221,6 @@
 - **v1.0.0**: 包括的なVirusTotal統合による初回リリース
   - 8つのセキュリティ分析ツール
   - 関係データの自動取得
-  - SSEとSTDIOトランスポート対応
+  - SSE、STDIO、StreamableHTTPトランスポート対応
   - レート制限対応
   - 完全なエラーハンドリング

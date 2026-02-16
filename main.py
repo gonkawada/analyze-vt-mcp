@@ -420,8 +420,13 @@ async def get_domain_relationship(
 
 
 if __name__ == "__main__":
-    transport = os.getenv("MCP_TRANSPORT", "sse")
+    transport = os.getenv("MCP_TRANSPORT", "sse").lower()
+    host = os.getenv("MCP_HOST", "0.0.0.0")
+    port = int(os.getenv("MCP_PORT", "8000"))
+    
     if transport == "stdio":
-        mcp.run(transport=transport)
-    else:
-        mcp.run(transport=transport, host="0.0.0.0", port=8000)
+        mcp.run(transport="stdio")
+    elif transport == "streamable-http":
+        mcp.run(transport="streamable-http", host=host, port=port)
+    else:  # Default to SSE
+        mcp.run(transport="sse", host=host, port=port)

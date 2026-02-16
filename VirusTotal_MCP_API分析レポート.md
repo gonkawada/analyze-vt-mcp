@@ -22,11 +22,26 @@ if not API_KEY:
 ```
 
 **MCP_TRANSPORT**
-- **場所**: `main.py` 423行
-- **用途**: トランスポート方式選択（STDIO/SSE）
-- **ソース**: 環境変数 (`os.getenv("MCP_TRANSPORT", "sse")`)
+- **場所**: `main.py` 421行
+- **用途**: トランスポート方式選択（STDIO/SSE/StreamableHTTP）
+- **ソース**: 環境変数 (`os.getenv("MCP_TRANSPORT", "sse").lower()`)
 - **デフォルト値**: "sse"
 - **セキュリティ影響**: 低 - 設定値のみ
+- **有効な値**: "stdio", "sse", "streamable-http"
+
+**MCP_HOST**
+- **場所**: `main.py` 422行
+- **用途**: SSE/StreamableHTTPトランスポートのホストアドレス
+- **ソース**: 環境変数 (`os.getenv("MCP_HOST", "0.0.0.0")`)
+- **デフォルト値**: "0.0.0.0"
+- **セキュリティ影響**: 中 - ネットワーク公開範囲に影響
+
+**MCP_PORT**
+- **場所**: `main.py` 423行
+- **用途**: SSE/StreamableHTTPトランスポートのポート番号
+- **ソース**: 環境変数 (`int(os.getenv("MCP_PORT", "8000"))`)
+- **デフォルト値**: 8000
+- **セキュリティ影響**: 低 - ポート番号のみ
 
 ### 1.2 ハードコードされた定数
 
@@ -49,10 +64,16 @@ if not API_KEY:
 - **根拠**: VirusTotal API仕様に基づく推奨値
 
 **ポート番号**
-- **値**: `8000`
-- **場所**: `main.py` 426行
-- **用途**: SSEトランスポートのリスニングポート
-- **設定**: ハードコード（環境変数化推奨）
+- **値**: デフォルト `8000`（環境変数で変更可能）
+- **場所**: `main.py` 423行
+- **用途**: SSE/StreamableHTTPトランスポートのリスニングポート
+- **設定**: 環境変数 `MCP_PORT` で設定可能
+
+**ホストアドレス**
+- **値**: デフォルト `"0.0.0.0"`（環境変数で変更可能）
+- **場所**: `main.py` 422行
+- **用途**: SSE/StreamableHTTPトランスポートのリスニングホスト
+- **設定**: 環境変数 `MCP_HOST` で設定可能
 
 ### 1.3 デフォルト関係データ配列
 
@@ -213,13 +234,20 @@ headers = {"x-apikey": API_KEY}
 
 ### 4.1 設定の外部化
 
-**現在ハードコードされている値の環境変数化**:
+**現在の設定管理状況**:
 ```python
-# 推奨改善
+# 実装済み - 環境変数による設定
+API_KEY = os.getenv("VIRUSTOTAL_API_KEY")  # 必須
+MCP_TRANSPORT = os.getenv("MCP_TRANSPORT", "sse").lower()  # オプション
+MCP_HOST = os.getenv("MCP_HOST", "0.0.0.0")  # オプション
+MCP_PORT = int(os.getenv("MCP_PORT", "8000"))  # オプション
+```
+
+**追加推奨改善**:
+```python
+# タイムアウトと待機時間の環境変数化
 TIMEOUT = float(os.getenv("VT_TIMEOUT", "30.0"))
 SCAN_WAIT_TIME = int(os.getenv("VT_SCAN_WAIT", "3"))
-SERVER_PORT = int(os.getenv("MCP_PORT", "8000"))
-SERVER_HOST = os.getenv("MCP_HOST", "0.0.0.0")
 ```
 
 ### 4.2 設定検証の強化
@@ -251,9 +279,10 @@ sanitized_headers = {k: "***" if "apikey" in k.lower() else v
 - 環境変数による設定管理
 - 必要最小限のハードコード値
 - セキュリティを考慮した実装
+- トランスポート設定の柔軟性
 
 **改善の余地**:
-- 一部設定値の環境変数化
+- タイムアウト値の環境変数化
 - 設定検証の強化
 
 ### 5.2 POSTメソッド使用状況

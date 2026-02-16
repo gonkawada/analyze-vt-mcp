@@ -100,8 +100,12 @@ VirusTotal MCPサーバーは、VirusTotal APIを使用してセキュリティ�
 
 1. THE MCP_Server SHALL STDIOトランスポートをサポートする（Claude Desktop統合用）
 2. THE MCP_Server SHALL SSEトランスポートをサポートする（Web統合用）
-3. WHEN MCP_TRANSPORT環境変数が"stdio"に設定された場合、THE MCP_Server SHALL STDIOトランスポートを使用する
-4. WHEN MCP_TRANSPORT環境変数が設定されていないか"sse"の場合、THE MCP_Server SHALL SSEトランスポートを使用し、ホスト0.0.0.0、ポート8000でリッスンする
+3. THE MCP_Server SHALL StreamableHTTPトランスポートをサポートする（HTTPストリーミング統合用）
+4. WHEN MCP_TRANSPORT環境変数が"stdio"に設定された場合、THE MCP_Server SHALL STDIOトランスポートを使用する
+5. WHEN MCP_TRANSPORT環境変数が"streamable-http"に設定された場合、THE MCP_Server SHALL StreamableHTTPトランスポートを使用し、指定されたホストとポートでリッスンする
+6. WHEN MCP_TRANSPORT環境変数が設定されていないか"sse"の場合、THE MCP_Server SHALL SSEトランスポートを使用し、指定されたホストとポートでリッスンする
+7. THE MCP_Server SHALL MCP_HOST環境変数でホストアドレスを設定可能にする（デフォルト: 0.0.0.0）
+8. THE MCP_Server SHALL MCP_PORT環境変数でポート番号を設定可能にする（デフォルト: 8000）
 
 ### 要件9: データフォーマットと表示
 

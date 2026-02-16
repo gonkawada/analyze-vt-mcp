@@ -647,21 +647,34 @@ async def get_domain_relationship(
 - **413行目**: 結果データの構築（ドメイン情報付き）
 - **415行目**: フォーマットされた結果の返却
 
-### 420-426行: メイン実行部分
+### 420-431行: メイン実行部分
 ```python
 if __name__ == "__main__":
-    transport = os.getenv("MCP_TRANSPORT", "sse")
+    transport = os.getenv("MCP_TRANSPORT", "sse").lower()
+    host = os.getenv("MCP_HOST", "0.0.0.0")
+    port = int(os.getenv("MCP_PORT", "8000"))
+    
     if transport == "stdio":
-        mcp.run(transport=transport)
-    else:
-        mcp.run(transport=transport, host="0.0.0.0", port=8000)
+        mcp.run(transport="stdio")
+    elif transport == "streamable-http":
+        mcp.run(transport="streamable-http", host=host, port=port)
+    else:  # Default to SSE
+        mcp.run(transport="sse", host=host, port=port)
 ```
 
 **解説**:
 - **420行目**: スクリプトが直接実行された場合の処理
-- **421行目**: 環境変数からトランスポート方式を取得（デフォルト: "sse"）
-- **422-423行目**: STDIOトランスポートの場合の実行
-- **424-425行目**: SSEトランスポートの場合の実行（ホスト、ポート指定）
+- **421行目**: 環境変数からトランスポート方式を取得し小文字に変換（デフォルト: "sse"）
+- **422行目**: 環境変数からホストアドレスを取得（デフォルト: "0.0.0.0"）
+- **423行目**: 環境変数からポート番号を取得し整数に変換（デフォルト: 8000）
+- **425-426行目**: STDIOトランスポートの場合の実行
+- **427-428行目**: StreamableHTTPトランスポートの場合の実行（ホスト、ポート指定）
+- **429-430行目**: SSEトランスポート（デフォルト）の場合の実行（ホスト、ポート指定）
+
+**トランスポートモードの説明**:
+- **STDIO**: 標準入出力を使用した通信（Claude Desktop統合用）
+- **SSE**: Server-Sent Eventsを使用したHTTP通信（Webアプリケーション用）
+- **StreamableHTTP**: チャンク転送エンコーディングを使用したHTTPストリーミング（カスタム統合用）
 
 ---
 
@@ -679,8 +692,9 @@ if __name__ == "__main__":
 
 ### 3. 柔軟な設定管理
 - 環境変数による設定
-- 複数トランスポート対応
+- 複数トランスポート対応（STDIO、SSE、StreamableHTTP）
 - デフォルト値の提供
+- ホストとポートのカスタマイズ可能
 
 ### 4. 構造化されたレスポンス
 - マークダウン形式の統一
